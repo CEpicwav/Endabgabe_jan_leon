@@ -5,7 +5,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const frontWindows = [];
   const backWindows = [];
 
-  // === Gebäude ===
+  // === Gebäude
   const mainBlock = document.createElement('a-box');
   mainBlock.setAttribute('position', '0 1 0');
   mainBlock.setAttribute('width', '6');
@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
   plattform.setAttribute('color', '#ccc');
   root.appendChild(plattform);
 
-  // === Fenster ===
+  // === Fenster
   for (let row = 0; row < 2; row++) {
     for (let col = 0; col < 6; col++) {
       const win = document.createElement('a-box');
@@ -106,6 +106,28 @@ for (let i = 0; i < 2000; i++) {
   rainGroup.appendChild(drop);
 }
   scene.appendChild(rainGroup);
+
+// === Wolkenhimmel bei Regen
+const cloudGroup = document.createElement('a-entity');
+cloudGroup.setAttribute('id', 'cloudGroup');
+cloudGroup.setAttribute('visible', 'false');
+
+// === Kugeln als Wolken
+for (let i = 0; i < 80; i++) {
+  const puff = document.createElement('a-sphere');
+  const x = Math.random() * 18 - 9 + 2;  
+  const y = 10.3 + Math.random() * 1;
+  const z = Math.random() * 10 - 5 + 0.5;
+  const scale = 1 + Math.random() * 1.5;
+
+  puff.setAttribute('position', `${x} ${y} ${z}`);
+  puff.setAttribute('radius', `${scale}`);
+  puff.setAttribute('color', '#aaa');
+  puff.setAttribute('material', 'transparent: true; opacity: 0.4; side: double');
+
+  cloudGroup.appendChild(puff);
+}
+scene.appendChild(cloudGroup);
 
   // === Audio
   const sunAudio = new Audio('sun.mp3');
