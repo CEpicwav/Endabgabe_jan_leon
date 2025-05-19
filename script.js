@@ -175,6 +175,7 @@ scene.appendChild(cloudGroup);
     sky.setAttribute('color', '#dfefff');
     ground.setAttribute('color', '#a7d899');
     document.getElementById('rainGroup')?.setAttribute('visible', 'false');
+    document.getElementById('cloudGroup')?.setAttribute('visible', 'false');
     resetWindows();
   }
 
@@ -183,6 +184,7 @@ scene.appendChild(cloudGroup);
     sky.setAttribute('color', '#0a0a2a');
     ground.setAttribute('color', '#223');
     document.getElementById('rainGroup')?.setAttribute('visible', 'false');
+    document.getElementById('cloudGroup')?.setAttribute('visible', 'false');
     randomizeWindowLights('night');
   }
 
@@ -191,6 +193,7 @@ scene.appendChild(cloudGroup);
     sky.setAttribute('color', '#7c8a97');
     ground.setAttribute('color', '#6c7a6f');
     document.getElementById('rainGroup')?.setAttribute('visible', 'true');
+    document.getElementById('cloudGroup')?.setAttribute('visible', 'true');
     randomizeWindowLights('rain');
   }
 
