@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D Gebäude mit 360° VR-Ansicht</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <style>
+    body, html { margin: 0; height: 100%; overflow: hidden; }
+    #ui-buttons {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      border: none;
+      background-color: #333;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- UI Buttons -->
+  <div id="ui-buttons">
+    <button id="sunBtn">Sonne</button>
+    <button id="nightBtn">Nacht</button>
+    <button id="rainBtn">Regen</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <a-scene embedded background="color: #dfefff" cursor="rayOrigin: mouse" raycaster="objects: .panorama-point">
+    <!-- Kamera -->
+    <a-entity id="camera" position="0 1.6 10" camera look-controls wasd-controls></a-entity>
+
+    <!-- Himmel -->
+    <a-sky id="sky" color="#dfefff"></a-sky>
+
+    <!-- Boden -->
+    <a-plane id="ground" rotation="-90 0 0" width="40" height="40" color="#a7d899" position="0 0 0"></a-plane>
+
+    <!-- Gebäude Root -->
+    <a-entity id="model-root" position="0 0 0"></a-entity>
+
+  </a-scene>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -90,49 +90,51 @@ window.addEventListener('DOMContentLoaded', () => {
   rainGroup.setAttribute('id', 'rainGroup');
   rainGroup.setAttribute('visible', 'false');
 
-for (let i = 0; i < 2000; i++) {
-  const drop = document.createElement("a-box");
-  const x = Math.random() * 30 - 10;
-  const y = Math.random() * 30 - 0;
-  const z = Math.random() * 20 - 5;
+  for (let i = 0; i < 2000; i++) {
+    const drop = document.createElement('a-box');
+    const x = Math.random() * 30 - 10;
+    const y = Math.random() * 30;
+    const z = Math.random() * 20 - 5;
 
-  drop.setAttribute("position", `${x} ${y} ${z}`);
-  drop.setAttribute("color", "#86c");
-  drop.setAttribute("width", "0.01");
-  drop.setAttribute("height", "0.04");
-  drop.setAttribute("depth", "0.01");
-
-  drop.setAttribute("animation", `property: position; to: ${x} 0 ${z}; dur: ${1000 + Math.random() * 2000}; loop: true; easing: linear`);
-  rainGroup.appendChild(drop);
-}
+    drop.setAttribute('position', `${x} ${y} ${z}`);
+    drop.setAttribute('color', '#86c');
+    drop.setAttribute('width', '0.01');
+    drop.setAttribute('height', '0.04');
+    drop.setAttribute('depth', '0.01');
+    drop.setAttribute('animation', `property: position; to: ${x} 0 ${z}; dur: ${1000 + Math.random() * 2000}; loop: true; easing: linear`);
+    rainGroup.appendChild(drop);
+  }
   scene.appendChild(rainGroup);
 
-// === Wolkenhimmel bei Regen
-const cloudGroup = document.createElement('a-entity');
-cloudGroup.setAttribute('id', 'cloudGroup');
-cloudGroup.setAttribute('visible', 'false');
+  // === Wolkenhimmel bei Regen
+  const cloudGroup = document.createElement('a-entity');
+  cloudGroup.setAttribute('id', 'cloudGroup');
+  cloudGroup.setAttribute('visible', 'false');
 
-// === Kugeln als Wolken
-for (let i = 0; i < 80; i++) {
-  const puff = document.createElement('a-sphere');
-  const x = Math.random() * 18 - 9 + 2;  
-  const y = 10.3 + Math.random() * 1;
-  const z = Math.random() * 10 - 5 + 0.5;
-  const scale = 1 + Math.random() * 1.5;
+  for (let i = 0; i < 80; i++) {
+    const puff = document.createElement('a-sphere');
+    const x = Math.random() * 18 - 7;  
+    const y = 10.3 + Math.random();
+    const z = Math.random() * 10 - 5;
+    const scale = 1 + Math.random() * 1.5;
 
-  puff.setAttribute('position', `${x} ${y} ${z}`);
-  puff.setAttribute('radius', `${scale}`);
-  puff.setAttribute('color', '#aaa');
-  puff.setAttribute('material', 'transparent: true; opacity: 0.4; side: double');
+    puff.setAttribute('position', `${x} ${y} ${z}`);
+    puff.setAttribute('radius', `${scale}`);
+    puff.setAttribute('color', '#aaa');
+    puff.setAttribute('material', 'transparent: true; opacity: 0.4; side: double');
 
-  cloudGroup.appendChild(puff);
-}
-scene.appendChild(cloudGroup);
+    cloudGroup.appendChild(puff);
+  }
+  scene.appendChild(cloudGroup);
 
   // === Audio
   const sunAudio = new Audio('sun.mp3');
+  sunAudio.loop = true;
   const nightAudio = new Audio('night.mp3');
+  nightAudio.loop = true;
   const rainAudio = new Audio('rain.mp3');
+  rainAudio.loop = true;
+
   const sky = document.getElementById('sky');
   const ground = document.getElementById('ground');
 
@@ -155,13 +157,11 @@ scene.appendChild(cloudGroup);
     if (mode === 'night' || mode === 'rain') {
       const allWindows = [...frontWindows, ...backWindows];
       const selected = [];
-
       const pool = [...allWindows];
       while (selected.length < 5 && pool.length > 0) {
         const index = Math.floor(Math.random() * pool.length);
         selected.push(pool.splice(index, 1)[0]);
       }
-
       selected.forEach(win => {
         win.setAttribute('color', '#ffd700');
         win.setAttribute('material', 'emissive: #ffea00; emissiveIntensity: 1;');
@@ -174,8 +174,8 @@ scene.appendChild(cloudGroup);
     stopAll(); sunAudio.play();
     sky.setAttribute('color', '#dfefff');
     ground.setAttribute('color', '#a7d899');
-    document.getElementById('rainGroup')?.setAttribute('visible', 'false');
-    document.getElementById('cloudGroup')?.setAttribute('visible', 'false');
+    rainGroup.setAttribute('visible', 'false');
+    cloudGroup.setAttribute('visible', 'false');
     resetWindows();
   }
 
@@ -183,8 +183,8 @@ scene.appendChild(cloudGroup);
     stopAll(); nightAudio.play();
     sky.setAttribute('color', '#0a0a2a');
     ground.setAttribute('color', '#223');
-    document.getElementById('rainGroup')?.setAttribute('visible', 'false');
-    document.getElementById('cloudGroup')?.setAttribute('visible', 'false');
+    rainGroup.setAttribute('visible', 'false');
+    cloudGroup.setAttribute('visible', 'false');
     randomizeWindowLights('night');
   }
 
@@ -192,13 +192,85 @@ scene.appendChild(cloudGroup);
     stopAll(); rainAudio.play();
     sky.setAttribute('color', '#7c8a97');
     ground.setAttribute('color', '#6c7a6f');
-    document.getElementById('rainGroup')?.setAttribute('visible', 'true');
-    document.getElementById('cloudGroup')?.setAttribute('visible', 'true');
+    rainGroup.setAttribute('visible', 'true');
+    cloudGroup.setAttribute('visible', 'true');
     randomizeWindowLights('rain');
+  }
+
+  function resetAll() {
+    stopAll();
+    sky.setAttribute('color', '#dfefff');
+    ground.setAttribute('color', '#a7d899');
+    rainGroup.setAttribute('visible', 'false');
+    cloudGroup.setAttribute('visible', 'false');
+    resetWindows();
   }
 
   // === Buttons
   document.getElementById('sunBtn')?.addEventListener('click', showSun);
   document.getElementById('nightBtn')?.addEventListener('click', showNight);
   document.getElementById('rainBtn')?.addEventListener('click', showRain);
+  document.getElementById('resetBtn')?.addEventListener('click', resetAll);
+
+  // === Kamera & VR-Panorama Wechsel
+
+  const camera = document.querySelector('#camera');
+
+  // 360° Panoramen
+  const panoramas = {
+    left: '360-left.jpg',
+    center: '360-center.jpg',
+    right: '360-right.jpg'
+  };
+
+  // Kugeln als Punkte zum Wechsel
+  const positions = {
+    left: { x: -3, y: 3, z: 0 },
+    center: { x: 0, y: 3, z: 0 },
+    right: { x: 4, y: 3, z: 0 }
+  };
+
+  // Kugeln erstellen
+  Object.entries(positions).forEach(([key, pos]) => {
+    const sphere = document.createElement('a-sphere');
+    sphere.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+    sphere.setAttribute('radius', '0.2');
+    sphere.setAttribute('color', '#ff0055');
+    sphere.setAttribute('material', 'shader: flat; opacity: 0.9');
+    sphere.setAttribute('class', 'panorama-point');
+    root.appendChild(sphere);
+
+    // Klick Event für Wechsel in Panorama-VR-Modus
+    sphere.addEventListener('click', () => {
+      enterPanorama(panoramas[key]);
+    });
+  });
+
+  // Standard Himmel speichern
+  const defaultSkySrc = sky.getAttribute('src');
+
+  // Funktion um Panorama anzuzeigen und Kamera dorthin zu teleportieren
+  function enterPanorama(imgSrc) {
+    // Kamera an die Position der Kugel bewegen (leicht zurück versetzt)
+    camera.setAttribute('position', '0 1.6 0'); // Hier ggf anpassen für VR-Modus
+    camera.setAttribute('rotation', '0 0 0');
+
+    // Himmel auf Panorama ändern
+    sky.setAttribute('src', imgSrc);
+
+    // Optional: UI Elemente ausblenden etc.
+  }
+
+  // Funktion um Panorama-Modus zu verlassen
+  function exitPanorama() {
+    sky.setAttribute('src', defaultSkySrc);
+    camera.setAttribute('position', '0 1.6 10');
+    camera.setAttribute('rotation', '0 0 0');
+  }
+
+  // Beispiel: Doppelklick auf Szene verlässt Panorama
+  scene.addEventListener('dblclick', () => {
+    exitPanorama();
+  });
+
 });
