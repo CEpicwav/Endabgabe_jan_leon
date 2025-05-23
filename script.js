@@ -1,5 +1,6 @@
 window.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#model-root');
+  let inPanoramaMode = false;
   const scene = document.querySelector('a-scene');
 
   const frontWindows = [];
@@ -249,28 +250,53 @@ window.addEventListener('DOMContentLoaded', () => {
   // Standard Himmel speichern
   const defaultSkySrc = sky.getAttribute('src');
 
-  // Funktion um Panorama anzuzeigen und Kamera dorthin zu teleportieren
-  function enterPanorama(imgSrc) {
-    // Kamera an die Position der Kugel bewegen (leicht zurück versetzt)
-    camera.setAttribute('position', '0 1.6 0'); // Hier ggf anpassen für VR-Modus
-    camera.setAttribute('rotation', '0 0 0');
+function enterPanorama(imgSrc) {
+  inPanoramaMode = true;
 
-    // Himmel auf Panorama ändern
-    sky.setAttribute('src', imgSrc);
+  // Alles ausblenden
+  root.setAttribute('visible', 'false');          // Gebäude
+  rainGroup.setAttribute('visible', 'false');     // Regen
+  cloudGroup.setAttribute('visible', 'false');    // Wolken
+  ground.setAttribute('visible', 'false');        // Boden
 
-    // Optional: UI Elemente ausblenden etc.
-  }
+  camera.setAttribute('position', '0 1.6 0');
+  camera.setAttribute('rotation', '0 0 0');
+  sky.setAttribute('src', imgSrc);
+}
 
-  // Funktion um Panorama-Modus zu verlassen
-  function exitPanorama() {
-    sky.setAttribute('src', defaultSkySrc);
-    camera.setAttribute('position', '0 1.6 10');
-    camera.setAttribute('rotation', '0 0 0');
-  }
+// Funktion um Panorama-Modus zu verlassen
+function exitPanorama() {
+  if (!inPanoramaMode) return;
+  inPanoramaMode = false;
 
-  // Beispiel: Doppelklick auf Szene verlässt Panorama
-  scene.addEventListener('dblclick', () => {
+  // Alles wieder einblenden
+  root.setAttribute('visible', 'true');
+  ground.setAttribute('visible', 'true');
+  sky.removeAttribute('src');
+  sky.setAttribute('color', '#dfefff');
+
+  // Sichtbarkeit von Regen & Wolken hängt vom Modus ab
+  rainGroup.setAttribute('visible', 'false');
+  cloudGroup.setAttribute('visible', 'false');
+
+  camera.setAttribute('position', '0 1.6 10');
+  camera.setAttribute('rotation', '0 0 0');
+}
+
+// Beispiel: Doppelklick auf Szene verlässt Panorama
+scene.addEventListener('dblclick', () => {
+  exitPanorama();
+});
+
+// ESC-Taste verlässt Panorama
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
     exitPanorama();
-  });
+  }
+});
 
+// Klicken auf den Boden verlässt Panorama
+ground.addEventListener('click', () => {
+  exitPanorama();
+});
 });
