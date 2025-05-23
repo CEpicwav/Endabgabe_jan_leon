@@ -12,6 +12,6 @@ Dieses Projekt ist eine multimediale Webanwendung, die visuelle und akustische I
 - Läuft vollständig lokal im Browser ohne zusätzliche Software
 
 ## Noch zum Einbauen 
-- AR mit Handy 
 - Sounds Dämpfen wenn im Gebäude
 - Poster oder Graffiti was auch andere Leute sehen 
+- Bugs fixen
