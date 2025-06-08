@@ -1,6 +1,10 @@
 window.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#model-root');
   let inPanoramaMode = false;
+  let currentPanorama = null;
+  let currentMode = 'sun'; // 'sun' | 'night' | 'rain'
+
+
   const scene = document.querySelector('a-scene');
 
   const frontWindows = [];
@@ -172,6 +176,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // === Modi
   function showSun() {
+    currentMode = 'sun';
     stopAll(); sunAudio.play();
     sky.setAttribute('color', '#dfefff');
     ground.setAttribute('color', '#a7d899');
@@ -181,6 +186,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function showNight() {
+    currentMode = 'night';
     stopAll(); nightAudio.play();
     sky.setAttribute('color', '#0a0a2a');
     ground.setAttribute('color', '#223');
@@ -189,14 +195,32 @@ window.addEventListener('DOMContentLoaded', () => {
     randomizeWindowLights('night');
   }
 
-  function showRain() {
-    stopAll(); rainAudio.play();
-    sky.setAttribute('color', '#7c8a97');
-    ground.setAttribute('color', '#6c7a6f');
+function showRain() {
+  currentMode = 'rain';
+  stopAll();
+  rainAudio.play();
+  sky.setAttribute('color', '#7c8a97');
+  ground.setAttribute('color', '#6c7a6f');
+
+  // Panorama-Modus: Regen nur bei "360-right"
+  if (inPanoramaMode) {
+    if (currentPanorama?.includes('right')) {
+      rainGroup.setAttribute('visible', 'true');
+      cloudGroup.setAttribute('visible', 'true');
+    } else {
+      rainGroup.setAttribute('visible', 'false');
+      cloudGroup.setAttribute('visible', 'false');
+    }
+  } else {
+    // Normalmodus: Regen und Wolken immer zeigen
     rainGroup.setAttribute('visible', 'true');
     cloudGroup.setAttribute('visible', 'true');
-    randomizeWindowLights('rain');
   }
+
+  randomizeWindowLights('rain');
+}
+
+
 
   function resetAll() {
     stopAll();
@@ -251,37 +275,56 @@ window.addEventListener('DOMContentLoaded', () => {
   const defaultSkySrc = sky.getAttribute('src');
 
 function enterPanorama(imgSrc) {
+  camera.removeAttribute('wasd-controls');
   inPanoramaMode = true;
+  currentPanorama = imgSrc;
 
   // Alles ausblenden
-  root.setAttribute('visible', 'false');          // Gebäude
-  rainGroup.setAttribute('visible', 'false');     // Regen
-  cloudGroup.setAttribute('visible', 'false');    // Wolken
-  ground.setAttribute('visible', 'false');        // Boden
+  root.setAttribute('visible', 'false');
+// Regen/Wolken nur zeigen, wenn 360-right aktiv ist und Regen aktuell eingeschaltet ist
+const isRainActive = !rainAudio.paused;
+const isRightPanorama = imgSrc.includes('right');
+
+rainGroup.setAttribute('visible', isRainActive && isRightPanorama);
+cloudGroup.setAttribute('visible', isRainActive && isRightPanorama);
+
+  ground.setAttribute('visible', 'false');
 
   camera.setAttribute('position', '0 1.6 0');
   camera.setAttribute('rotation', '0 0 0');
   sky.setAttribute('src', imgSrc);
 }
 
+
 // Funktion um Panorama-Modus zu verlassen
 function exitPanorama() {
   if (!inPanoramaMode) return;
+  camera.removeAttribute('wasd-controls');
   inPanoramaMode = false;
+  currentPanorama = null;
 
-  // Alles wieder einblenden
   root.setAttribute('visible', 'true');
   ground.setAttribute('visible', 'true');
   sky.removeAttribute('src');
-  sky.setAttribute('color', '#dfefff');
 
-  // Sichtbarkeit von Regen & Wolken hängt vom Modus ab
-  rainGroup.setAttribute('visible', 'false');
-  cloudGroup.setAttribute('visible', 'false');
+if (currentMode === 'sun') {
+  sky.setAttribute('color', '#dfefff');
+} else if (currentMode === 'night') {
+  sky.setAttribute('color', '#0a0a2a');
+} else if (currentMode === 'rain') {
+  sky.setAttribute('color', '#7c8a97');
+}
+
+
+  const isRainActive = !rainAudio.paused;
+rainGroup.setAttribute('visible', isRainActive);
+cloudGroup.setAttribute('visible', isRainActive);
+
 
   camera.setAttribute('position', '0 1.6 10');
   camera.setAttribute('rotation', '0 0 0');
 }
+
 
 // Beispiel: Doppelklick auf Szene verlässt Panorama
 scene.addEventListener('dblclick', () => {
