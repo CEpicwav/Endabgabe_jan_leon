@@ -279,21 +279,27 @@ function enterPanorama(imgSrc) {
   inPanoramaMode = true;
   currentPanorama = imgSrc;
 
-  // Alles ausblenden
   root.setAttribute('visible', 'false');
-// Regen/Wolken nur zeigen, wenn 360-right aktiv ist und Regen aktuell eingeschaltet ist
-const isRainActive = !rainAudio.paused;
-const isRightPanorama = imgSrc.includes('right');
 
-rainGroup.setAttribute('visible', isRainActive && isRightPanorama);
-cloudGroup.setAttribute('visible', isRainActive && isRightPanorama);
+  const isRainActive = !rainAudio.paused;
+  const isRightPanorama = imgSrc.includes('right');
+
+  rainGroup.setAttribute('visible', isRainActive && isRightPanorama);
+  cloudGroup.setAttribute('visible', isRainActive && isRightPanorama);
 
   ground.setAttribute('visible', 'false');
-
   camera.setAttribute('position', '0 1.6 0');
   camera.setAttribute('rotation', '0 0 0');
   sky.setAttribute('src', imgSrc);
+
+  // === 🎧 Audio dämpfen für center & left
+  const inside = imgSrc.includes('center') || imgSrc.includes('left');
+  const volume = inside ? 0.2 : 1.0; // gedämpft oder normal
+  sunAudio.volume = volume;
+  nightAudio.volume = volume;
+  rainAudio.volume = volume;
 }
+
 
 
 // Funktion um Panorama-Modus zu verlassen
@@ -314,6 +320,11 @@ if (currentMode === 'sun') {
 } else if (currentMode === 'rain') {
   sky.setAttribute('color', '#7c8a97');
 }
+// Volumen wieder auf normal
+sunAudio.volume = 1.0;
+nightAudio.volume = 1.0;
+rainAudio.volume = 1.0;
+
 
 
   const isRainActive = !rainAudio.paused;
