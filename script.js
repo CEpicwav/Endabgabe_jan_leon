@@ -9,6 +9,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const frontWindows = [];
   const backWindows = [];
+  const exitBtn = document.getElementById('exitPanoramaBtn');
+
 
   // === Gebäude
   const mainBlock = document.createElement('a-box');
@@ -291,6 +293,9 @@ function enterPanorama(imgSrc) {
   camera.setAttribute('position', '0 1.6 0');
   camera.setAttribute('rotation', '0 0 0');
   sky.setAttribute('src', imgSrc);
+  exitBtn.style.display = 'inline-block';
+
+  
 
   // === 🎧 Audio dämpfen für center & left
   const inside = imgSrc.includes('center') || imgSrc.includes('left');
@@ -334,6 +339,7 @@ cloudGroup.setAttribute('visible', isRainActive);
 
   camera.setAttribute('position', '0 1.6 10');
   camera.setAttribute('rotation', '0 0 0');
+  exitBtn.style.display = 'none';
 }
 
 
@@ -351,6 +357,10 @@ window.addEventListener('keydown', (event) => {
 
 // Klicken auf den Boden verlässt Panorama
 ground.addEventListener('click', () => {
+  exitPanorama();
+});
+
+exitBtn.addEventListener('click', () => {
   exitPanorama();
 });
 });
