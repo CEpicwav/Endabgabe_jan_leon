@@ -2,10 +2,20 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>3D Gebäude mit 360° VR-Ansicht</title>
+  <title>I Bau 3D Modell</title>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <style>
     body, html { margin: 0; height: 100%; overflow: hidden; }
+    .zeichenCanvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 1px solid #000;
+      z-index: 10;
+      display: none;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
     #ui-buttons {
       position: fixed;
       top: 10px;
@@ -38,9 +48,13 @@
     <button id="rainBtn">Regen</button>
     <button id="resetBtn">Reset</button>
     <button id="exitPanoramaBtn" style="display: none;">Zurück</button>
-
   </div>
 
+  <!-- Zeichen-Canvas -->
+  <canvas id="canvas1" width="512" height="512" class="zeichenCanvas"></canvas>
+  <canvas id="canvas2" width="512" height="512" class="zeichenCanvas"></canvas>
+  <canvas id="canvas3" width="512" height="512" class="zeichenCanvas"></canvas>
+  
   <a-scene embedded background="color: #dfefff" cursor="rayOrigin: mouse" raycaster="objects: .panorama-point">
     <!-- Kamera -->
     <a-entity id="camera" position="0 1.6 10" camera look-controls wasd-controls></a-entity>
@@ -56,6 +70,6 @@
 
   </a-scene>
 
-  <script src="script.js"></script>
+  <script src="script.js"defer></script>
 </body>
 </html>
