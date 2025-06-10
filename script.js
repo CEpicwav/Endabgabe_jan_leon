@@ -1,8 +1,9 @@
+let zeichenModusAktiv = false;
 window.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#model-root');
   let inPanoramaMode = false;
   let currentPanorama = null;
-  let currentMode = 'sun'; // 'sun' | 'night' | 'rain'
+  let currentMode = 'sun';
 
 
   const scene = document.querySelector('a-scene');
@@ -12,7 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const exitBtn = document.getElementById('exitPanoramaBtn');
 
 
-  // === Gebäude
+  // Gebäude
   const mainBlock = document.createElement('a-box');
   mainBlock.setAttribute('position', '0 1 0');
   mainBlock.setAttribute('width', '6');
@@ -47,7 +48,7 @@ window.addEventListener('DOMContentLoaded', () => {
   plattform.setAttribute('color', '#ccc');
   root.appendChild(plattform);
 
-  // === Fenster
+  // Fenster
   for (let row = 0; row < 2; row++) {
     for (let col = 0; col < 6; col++) {
       const win = document.createElement('a-box');
@@ -71,7 +72,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // === Glas
+  // Glas
   const entry = document.createElement('a-box');
   entry.setAttribute('position', '3 1 0.1');
   entry.setAttribute('width', '0.9');
@@ -92,7 +93,7 @@ window.addEventListener('DOMContentLoaded', () => {
   studioG.setAttribute('material', 'opacity: 0.5; metalness: 0.3; roughness: 0.1;');
   root.appendChild(studioG);
 
-  // === Regen-Partikel
+  // Regen-Partikel
   const rainGroup = document.createElement('a-entity');
   rainGroup.setAttribute('id', 'rainGroup');
   rainGroup.setAttribute('visible', 'false');
@@ -113,7 +114,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   scene.appendChild(rainGroup);
 
-  // === Wolkenhimmel bei Regen
+  // Wolkenhimmel bei Regen
   const cloudGroup = document.createElement('a-entity');
   cloudGroup.setAttribute('id', 'cloudGroup');
   cloudGroup.setAttribute('visible', 'false');
@@ -134,7 +135,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   scene.appendChild(cloudGroup);
 
-  // === Audio
+  // Audio
   const sunAudio = new Audio('sun.mp3');
   sunAudio.loop = true;
   const nightAudio = new Audio('night.mp3');
@@ -176,7 +177,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // === Modi
+  // Modi
   function showSun() {
     currentMode = 'sun';
     stopAll(); sunAudio.play();
@@ -233,13 +234,13 @@ function showRain() {
     resetWindows();
   }
 
-  // === Buttons
+  // Buttons
   document.getElementById('sunBtn')?.addEventListener('click', showSun);
   document.getElementById('nightBtn')?.addEventListener('click', showNight);
   document.getElementById('rainBtn')?.addEventListener('click', showRain);
   document.getElementById('resetBtn')?.addEventListener('click', resetAll);
 
-  // === Kamera & VR-Panorama Wechsel
+  // Kamera & VR-Panorama Wechsel
 
   const camera = document.querySelector('#camera');
 
@@ -270,6 +271,7 @@ function showRain() {
     // Klick Event für Wechsel in Panorama-VR-Modus
     sphere.addEventListener('click', () => {
       enterPanorama(panoramas[key]);
+      showPlaneByKey(key);
     });
   });
 
@@ -297,7 +299,7 @@ function enterPanorama(imgSrc) {
 
   
 
-  // === 🎧 Audio dämpfen für center & left
+  // Audio dämpfen für center & left
   const inside = imgSrc.includes('center') || imgSrc.includes('left');
   const volume = inside ? 0.2 : 1.0; // gedämpft oder normal
   sunAudio.volume = volume;
@@ -330,7 +332,13 @@ sunAudio.volume = 1.0;
 nightAudio.volume = 1.0;
 rainAudio.volume = 1.0;
 
-
+  // Canvas verstecken + Events entfernen
+  Object.values(canvasMap).forEach(c => {
+    c.style.display = "none";
+    c.onmousedown = null;
+    c.onmouseup = null;
+    c.onmousemove = null;
+  });
 
   const isRainActive = !rainAudio.paused;
 rainGroup.setAttribute('visible', isRainActive);
@@ -363,4 +371,181 @@ ground.addEventListener('click', () => {
 exitBtn.addEventListener('click', () => {
   exitPanorama();
 });
+
+// Graffiti-Wände erzeugen
+const graffitiPlanes = [
+  { id: "plane1", canvas: "#canvas1", position: "-2 1.6 -3" },
+  { id: "plane2", canvas: "#canvas2", position: "0 1.6 -3" },
+  { id: "plane3", canvas: "#canvas3", position: "2 1.6 -3" },
+];
+
+const planeMap = {}; 
+
+graffitiPlanes.forEach(({ id, canvas, position }) => {
+  const plane = document.createElement('a-plane');
+  plane.setAttribute('id', id);
+  plane.setAttribute('position', position);
+  plane.setAttribute('width', '2');
+  plane.setAttribute('height', '2');
+  plane.setAttribute('visible', 'false'); 
+  plane.setAttribute('material', `shader: flat; src: ${canvas}`);
+  scene.appendChild(plane);
+  planeMap[id] = plane;
+});
+
+//Canvas Zeichnen
+function showPlaneByKey(key) {
+  const keyMap = {
+    left: 1,
+    center: 2,
+    right: 3
+  };
+
+  const num = keyMap[key];
+  if (!num) return;
+
+  // Canvases verstecken
+  Object.values(canvasMap).forEach(c => c.style.display = "none");
+
+  // Planes verstecken
+  Object.values(planeMap).forEach(p => p.setAttribute('visible', 'false'));
+
+  // Nur zugewählte Plane anzeigen
+  document.querySelector(`#plane${num}`).setAttribute('visible', 'true');
+
+  aktiveNummer = num;
+  zeichenModusAktiv = true;
+}
+
+// === ZEICHENLOGIK ===
+  const canvasMap = {
+    1: document.getElementById("canvas1"),
+    2: document.getElementById("canvas2"),
+    3: document.getElementById("canvas3"),
+  };
+
+  const contextMap = {};
+  let aktiveNummer = null;
+  let zeichnen = false;
+
+  for (const [num, canvas] of Object.entries(canvasMap)) {
+    const ctx = canvas.getContext("2d");
+
+    // Hintergrund weiß setzen
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+    contextMap[num] = ctx;
+  }
+
+  function getCanvasCoords(canvas, event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+
+  function toggleCanvas(num) {
+    const canvas = canvasMap[num];
+
+    if (aktiveNummer === num) {
+      canvas.style.display = "none";
+      aktiveNummer = null;
+      return;
+    }
+
+    if (aktiveNummer) {
+      canvasMap[aktiveNummer].style.display = "none";
+    }
+
+    aktiveNummer = num;
+    canvas.style.display = "block";
+
+    const ctx = contextMap[num];
+
+    canvas.onmousedown = (e) => {
+      zeichnen = true;
+      const pos = getCanvasCoords(canvas, e);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    };
+
+    canvas.onmouseup = () => zeichnen = false;
+
+    canvas.onmousemove = (e) => {
+      if (!zeichnen) return;
+      const pos = getCanvasCoords(canvas, e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+      updatePlaneTexture(num);
+    };
+  }
+
+  function updatePlaneTexture(num) {
+    const plane = document.querySelector(`#plane${num}`);
+    const mesh = plane.getObject3D('mesh');
+    if (mesh && mesh.material.map) {
+      mesh.material.map.needsUpdate = true;
+    }
+  }
+
+// Canvas auswählen und überprüfen zum Zeichnen
+document.addEventListener("keydown", (event) => {
+  if (!zeichenModusAktiv) return;
+
+  const key = event.key;
+  if (!["1", "2", "3"].includes(key)) return;
+
+  const plane = document.querySelector(`#plane${key}`);
+  const isPlaneVisible = plane?.getAttribute("visible");
+
+  // Nur Canvas zeigen/verstecken, wenn plane sichtbar
+  if (isPlaneVisible) {
+    toggleCanvas(Number(key));
+  }
+});
+
+  // Alle Canvases ausblenden
+function toggleCanvas(num) {
+  const canvas = canvasMap[num];
+
+  if (aktiveNummer === num) {
+    canvas.style.display = "none";
+    aktiveNummer = null;
+    return;
+  }
+
+  // Alle anderen schließen
+  Object.values(canvasMap).forEach(c => {
+    c.style.display = "none";
+    c.onmousedown = null;
+    c.onmouseup = null;
+    c.onmousemove = null;
+  });
+
+  aktiveNummer = num;
+  canvas.style.display = "block";
+
+  const ctx = contextMap[num];
+
+  canvas.onmousedown = (e) => {
+    zeichnen = true;
+    const pos = getCanvasCoords(canvas, e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  };
+
+  canvas.onmouseup = () => zeichnen = false;
+
+  canvas.onmousemove = (e) => {
+    if (!zeichnen) return;
+    const pos = getCanvasCoords(canvas, e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    updatePlaneTexture(num);
+  };
+};
 });
