@@ -332,14 +332,6 @@ sunAudio.volume = 1.0;
 nightAudio.volume = 1.0;
 rainAudio.volume = 1.0;
 
-  // Canvas verstecken + Events entfernen
-  Object.values(canvasMap).forEach(c => {
-    c.style.display = "none";
-    c.onmousedown = null;
-    c.onmouseup = null;
-    c.onmousemove = null;
-  });
-
   const isRainActive = !rainAudio.paused;
 rainGroup.setAttribute('visible', isRainActive);
 cloudGroup.setAttribute('visible', isRainActive);
@@ -347,7 +339,20 @@ cloudGroup.setAttribute('visible', isRainActive);
 
   camera.setAttribute('position', '0 1.6 10');
   camera.setAttribute('rotation', '0 0 0');
+  camera.setAttribute('wasd-controls', '');
   exitBtn.style.display = 'none';
+  zeichenModusAktiv = false;
+  aktiveNummer = null;
+
+  // Canvas verstecken + Events entfernen
+  Object.values(canvasMap).forEach(c => {
+    c.style.display = "none";
+    c.onmousedown = null;
+    c.onmouseup = null;
+    c.onmousemove = null;
+  });
+// Alle Graffiti-Planes unsichtbar machen
+Object.values(planeMap).forEach(p => p.setAttribute('visible', 'false'));
 }
 
 
@@ -507,45 +512,4 @@ document.addEventListener("keydown", (event) => {
     toggleCanvas(Number(key));
   }
 });
-
-  // Alle Canvases ausblenden
-function toggleCanvas(num) {
-  const canvas = canvasMap[num];
-
-  if (aktiveNummer === num) {
-    canvas.style.display = "none";
-    aktiveNummer = null;
-    return;
-  }
-
-  // Alle anderen schließen
-  Object.values(canvasMap).forEach(c => {
-    c.style.display = "none";
-    c.onmousedown = null;
-    c.onmouseup = null;
-    c.onmousemove = null;
-  });
-
-  aktiveNummer = num;
-  canvas.style.display = "block";
-
-  const ctx = contextMap[num];
-
-  canvas.onmousedown = (e) => {
-    zeichnen = true;
-    const pos = getCanvasCoords(canvas, e);
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-  };
-
-  canvas.onmouseup = () => zeichnen = false;
-
-  canvas.onmousemove = (e) => {
-    if (!zeichnen) return;
-    const pos = getCanvasCoords(canvas, e);
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-    updatePlaneTexture(num);
-  };
-};
-});
+})
