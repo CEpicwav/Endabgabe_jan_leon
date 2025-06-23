@@ -379,19 +379,20 @@ exitBtn.addEventListener('click', () => {
 
 // Graffiti-Wände erzeugen
 const graffitiPlanes = [
-  { id: "plane1", canvas: "#canvas1", position: "-2 1.6 -3" },
-  { id: "plane2", canvas: "#canvas2", position: "0 1.6 -3" },
-  { id: "plane3", canvas: "#canvas3", position: "2 1.6 -3" },
+  { id: "plane1", canvas: "#canvas1", position: "-6 4 -2.4", rotation:"0 65 0", width:"6", height:"6" },
+  { id: "plane2", canvas: "#canvas2", position: "4.3 1.6 -7", rotation:"0 -25 0", width:"8", height:"10" },
+  { id: "plane3", canvas: "#canvas3", position: "12 8.5 15", rotation:"0 -130 1", width:"12", height:"18" },
 ];
 
 const planeMap = {}; 
 
-graffitiPlanes.forEach(({ id, canvas, position }) => {
+graffitiPlanes.forEach(({ id, canvas, position, rotation, width, height }) => {
   const plane = document.createElement('a-plane');
   plane.setAttribute('id', id);
   plane.setAttribute('position', position);
-  plane.setAttribute('width', '2');
-  plane.setAttribute('height', '2');
+  plane.setAttribute('rotation', rotation)
+  plane.setAttribute('width', width);
+  plane.setAttribute('height', height);
   plane.setAttribute('visible', 'false'); 
   plane.setAttribute('material', `shader: flat; src: ${canvas}`);
   scene.appendChild(plane);
@@ -512,4 +513,19 @@ document.addEventListener("keydown", (event) => {
     toggleCanvas(Number(key));
   }
 });
+
+  // Alle 5 Minuten Canvas clearen
+setInterval(() => {
+  Object.entries(contextMap).forEach(([num, ctx]) => {
+    ctx.clearRect(0, 0, canvasMap[num].width, canvasMap[num].height);
+
+    // Hintergrund wieder weiß setzen
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvasMap[num].width, canvasMap[num].height);
+
+    updatePlaneTexture(num);
+  });
+  console.log("Alle Canvases wurden automatisch geleert.");
+}, 300000); 
+
 })
