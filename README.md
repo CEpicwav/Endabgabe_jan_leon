@@ -13,7 +13,6 @@ Dieses Projekt ist eine multimediale Webanwendung, die visuelle und akustische I
 - Poster oder Graffiti zum Zeichnen mit Tasten (1,2,3) in den Räumen
 
 ## Noch zum Einbauen 
-- Poster oder Graffiti and richtige stelle und schön machen
 - jedes Gerät bekommt eine random Farbe
 - Server von Schnell
 - Bugs fixen
