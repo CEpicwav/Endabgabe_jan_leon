@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>I Bau 3D Modell</title>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <div id="info-display"></div>
+  <div id="playerCountDisplay">Spieler online: 0</div>
   <style>
     body, html { margin: 0; height: 100%; overflow: hidden; }
     .zeichenCanvas {
@@ -36,6 +38,20 @@
     }
     button:hover {
       background-color: #555;
+    }
+    #playerCountDisplay {
+      position: absolute;
+      top: 70px;
+      right: 30px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ffcc00;
+      z-index: 10;
+      border: 2px solid #ffcc00;
+    font-family: sans-serif;
     }
   </style>
 </head>
