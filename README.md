@@ -6,13 +6,13 @@ Dieses Projekt ist eine multimediale Webanwendung, die visuelle und akustische I
 
 ## Funktionen
 
+- A-Frame Gebäude (I-Bau)
 - Anzeige von 360°-Bildern (center, left, right)
 - Wiedergabe von verschiedenen Hintergrundgeräuschen (Nacht, Regen, Sonne)
 - Benutzerinteraktion über einfache Klicks
-- Läuft vollständig lokal im Browser ohne zusätzliche Software
 - Poster oder Graffiti zum Zeichnen mit Tasten (1,2,3) in den Räumen
-
+- Server von Schnell
+  
 ## Noch zum Einbauen 
 - jedes Gerät bekommt eine random Farbe
-- Server von Schnell
-- Bugs fixen
+- Canva connecten
