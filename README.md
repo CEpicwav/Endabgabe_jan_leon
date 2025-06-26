@@ -16,4 +16,4 @@ Dieses Projekt ist eine multimediale Webanwendung, die visuelle und akustische I
   
 ## Noch zum Einbauen 
 - jedes Gerät bekommt eine random Farbe
-- lineto connectet sich mit anderen Clients 
+- Bugfixen lineto connectet sich mit anderen Clients 
