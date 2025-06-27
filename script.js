@@ -492,10 +492,8 @@ canvas.onmousedown = (e) => {
   const pos = getCanvasCoords(canvas, e);
   ctx.beginPath();
   ctx.moveTo(pos.x, pos.y);
-  // Lokal zeichnen
-  lastPositions[`${clientId}_${num}`] = { x: pos.x, y: pos.y };
   // An andere senden
-  sendRequest('*broadcast-message*', ['draw-start', num, pos.x, pos.y, clientId]);
+  sendRequest('*broadcast-message*', ['draw-start', num, pos.x, pos.y]);
 };
 
   canvas.onmouseup = () => zeichnen = false;
@@ -506,8 +504,7 @@ canvas.onmousedown = (e) => {
   ctx.lineTo(pos.x, pos.y);
   ctx.stroke();
   updatePlaneTexture(num);
-  lastPositions[`${clientId}_${num}`] = { x: pos.x, y: pos.y };
-  sendRequest('*broadcast-message*', ['draw-line', num, pos.x, pos.y, clientId]);
+  sendRequest('*broadcast-message*', ['draw-line', num, pos.x, pos.y]);
 };
   }
 
@@ -605,33 +602,25 @@ case 'draw-start': {
   const canvasNum = incoming[1];
   const x = incoming[2];
   const y = incoming[3];
-  const senderId = incoming[4];
   // Eigene Nachrichten ignorieren
-  if (senderId === clientId) break;
-  const ctx = contextMap[canvasNum];
   if (!ctx) break;
   ctx.beginPath();
   ctx.moveTo(x, y);
-  lastPositions[`${senderId}_${canvasNum}`] = { x, y };
   break;
 }
-case 'draw-line': {
+case 'draw-line': { 
   const canvasNum = incoming[1];
   const x = incoming[2];
   const y = incoming[3];
-  const senderId = incoming[4];
-  if (senderId === clientId) break;
   const ctx = contextMap[canvasNum];
   if (!ctx) break;
-  // Optional: falls kein Pfad existiert, beginne einen neuen
-  if (!lastPositions[`${senderId}_${canvasNum}`]) {
     ctx.beginPath();
     ctx.moveTo(x, y);
-  }
+ 
   ctx.lineTo(x, y);
   ctx.stroke();
   updatePlaneTexture(canvasNum);
-  lastPositions[`${senderId}_${canvasNum}`] = { x, y };
+
   break;
 }
       case '*client-enter*':
