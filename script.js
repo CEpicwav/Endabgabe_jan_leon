@@ -602,62 +602,58 @@ case 'draw-start': {
   const canvasNum = incoming[1];
   const x = incoming[2];
   const y = incoming[3];
+  const ctx = contextMap[canvasNum]; // <--- das fehlt!
   // Eigene Nachrichten ignorieren
   if (!ctx) break;
   ctx.beginPath();
   ctx.moveTo(x, y);
   break;
 }
+
 case 'draw-line': { 
   const canvasNum = incoming[1];
   const x = incoming[2];
   const y = incoming[3];
   const ctx = contextMap[canvasNum];
   if (!ctx) break;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
- 
   ctx.lineTo(x, y);
   ctx.stroke();
   updatePlaneTexture(canvasNum);
-
   break;
 }
-      case '*client-enter*':
-        const enterId = incoming[1];
-        console.log(`client #${enterId} has entered the room`);
-        break;
+case '*client-enter*':
+  const enterId = incoming[1];
+  console.log(`client #${enterId} has entered the room`);
+    break;
 
-        case '*client-id*':
-      clientId = incoming[1];
-      break;
+case '*client-id*':
+  clientId = incoming[1];
+    break;
 
-      case '*client-exit*':
-        const exitId = incoming[1];
-        console.log(`client #${exitId} has left the room`);
-        break;
+case '*client-exit*':
+  const exitId = incoming[1];
+  console.log(`client #${exitId} has left the room`);
+   break;
 
       // 'hello there' messages sent from other clients
-      case 'hello-there':
-        const otherId = incoming[1];
-        console.log(`client #${otherId} says 'Hello there!'`);
+case 'hello-there':
+  const otherId = incoming[1];
+  console.log(`client #${otherId} says 'Hello there!'`);
+  highlightText(titleDisplay); // highlight screen by others (function defined above)
+    break;
 
-        highlightText(titleDisplay); // highlight screen by others (function defined above)
-        break;
+case '*error*': {
+  const message = incoming[1];
+  console.warn('server error:', ...message);
+    break;
+  }
 
-      case '*error*': {
-        const message = incoming[1];
-        console.warn('server error:', ...message);
-        break;
-      }
-
-      default:
-        console.log(`unknown incoming messsage: [${incoming}]`);
-        break;
-    
-    }
-        console.log(data)
-        '*get-client-count*'
+default:
+  console.log(`unknown incoming messsage: [${incoming}]`);
+    break;    
+}
+  console.log(data)
+  '*get-client-count*'
   }
 });
 })
